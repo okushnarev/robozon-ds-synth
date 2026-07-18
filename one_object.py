@@ -70,6 +70,21 @@ if __name__ == '__main__':
     conveyor.set_location([0, 0, args.conveyor_height])
     conveyor.enable_rigidbody(active=False, collision_shape='MESH')
 
+    # Create invisible tilted walls for positioning on conveyor
+    wall_top = bproc.object.create_primitive('PLANE')
+    wall_top.set_scale([10, 10, 10])
+    wall_top.set_location([0, args.conveyor_width / 2, args.conveyor_height])
+    wall_top.set_rotation_euler([np.deg2rad(80), 0, 0])
+    wall_top.enable_rigidbody(active=False)
+    wall_top.hide()
+
+    wall_bot = bproc.object.create_primitive('PLANE')
+    wall_bot.set_scale([10, 10, 10])
+    wall_bot.set_location([0, - args.conveyor_width / 2, args.conveyor_height])
+    wall_bot.set_rotation_euler([np.deg2rad(-80), 0, 0])
+    wall_bot.enable_rigidbody(active=False)
+    wall_bot.hide()
+
     # Create ambient light
     sun = bproc.types.Light('SUN')
     sun.blender_obj.data.use_shadow = False
