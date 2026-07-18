@@ -69,6 +69,23 @@ if __name__ == '__main__':
     sun.blender_obj.data.angle = np.deg2rad(90)
     sun.set_energy(10)
 
+    # Create local lights
+    light_top = bproc.types.Light('AREA', 'light_top')
+    light_top.blender_obj.data.shape = 'RECTANGLE'
+    light_top.blender_obj.data.size = 0.6
+    light_top.blender_obj.data.size_y = 0.3
+    light_top.set_location([0, 0.7, 1.4])
+    light_top.set_rotation_euler([np.deg2rad(-45), 0, 0])
+    light_top.set_energy(10)
+
+    light_bot = bproc.types.Light('AREA', 'light_bot')
+    light_bot.blender_obj.data.shape = 'RECTANGLE'
+    light_bot.blender_obj.data.size = 0.6
+    light_bot.blender_obj.data.size_y = 0.3
+    light_bot.set_location([0, -0.7, 1.4])
+    light_bot.set_rotation_euler([np.deg2rad(45), 0, 0])
+    light_bot.set_energy(10)
+
     # Load object
     obj = bproc.loader.load_blend(args.objects_dir / f'{args.object}.blend')[0]
     obj.set_cp('category_id', 1) # Use category_id > 0 to appear is segmap. 0 is background
