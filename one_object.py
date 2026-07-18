@@ -24,6 +24,10 @@ def parse_args():
     setup_args.add_argument('--camera-elevation', '-ce', type=float, default=1,
                         help='Camera elevation in meters from conveyor')
 
+    image_args = parser.add_argument_group('Image arguments')
+    image_args.add_argument('--image-width', '-iw', type=int, default=1920, help='Image width in pixels')
+    image_args.add_argument('--image-height', '-ih', type=int, default=1440, help='Image width in pixels')
+
     renderer_args = parser.add_argument_group('Renderer arguments')
     renderer_args.add_argument('--max-samples', type=int, default=128, help='Max samples to render')
     renderer_args.add_argument('--noise-threshold', type=float, default=0.5, help='Noise threshold renderer parameter')
@@ -69,6 +73,21 @@ if __name__ == '__main__':
     obj = bproc.loader.load_blend(args.objects_dir / f'{args.object}.blend')[0]
     obj.set_cp('category_id', 1) # Use category_id > 0 to appear is segmap. 0 is background
     obj.enable_rigidbody(active=True)
+
+    # Camera params
+    s_x = args.image_width / 640  # base width
+    s_y = args.image_height / 480  # base height
+
+    fx = 355.0066183 * s_x
+    fy = 355.066183 * s_y
+    cx = 320 * s_x
+    cy = 240 * s_y
+    K = np.array([
+        [fx, 0, cx],
+        [0, fy, cy],
+        [0, 0, 1]
+    ])
+    bproc.camera.set_intrinsics_from_K_matrix(K, args.image_width, args.image_height)
 
     # Set the camera to be in front of the object
     cam_pose = bproc.math.build_transformation_mat([0, 0, args.conveyor_height + args.camera_elevation], [0, 0, 0])
