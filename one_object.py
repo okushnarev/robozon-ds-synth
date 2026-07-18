@@ -139,6 +139,15 @@ if __name__ == '__main__':
 
     rng = np.random.default_rng(args.seed)
 
+    # Shift rng to generate new image when append_out is set
+    if args.append_out:
+        N_REQUESTS = 3 # Requests to RNG per render. 3 for angles, 2 for location
+        names_idx = [int(x.stem) for x in args.output_dir.glob('*.hdf5')]
+        if len(names_idx):
+            max_idx = max(names_idx)
+            rng.bit_generator.advance(max_idx * N_REQUESTS)
+
+
     for _ in range(args.num_images):
         bproc.utility.reset_keyframes()
 
