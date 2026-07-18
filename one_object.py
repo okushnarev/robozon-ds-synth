@@ -16,6 +16,9 @@ def parse_args():
     parser.add_argument('--output-dir', '-od', type=Path, default=Path('output'),
                         help='Directory to output .hdf5 files')
 
+    parser.add_argument('--strict-center', action='store_true',
+                        help='Reposition objects at frame center after simulation')
+
     parser.add_argument('--append-out', '-ao', action='store_true', help='Auto append frame name in out folder')
     parser.add_argument('--seed', type=int, default=69, help='Seed for random number generator')
 
@@ -38,7 +41,8 @@ def parse_args():
     args = parser.parse_args()
     # Checks
     if args.n_images > 1 and not args.append_out:
-        parser.error('Should use --append-out (-ao) when --n-images (-n) > 1. Otherwise only the last render will be saved')
+        parser.error(
+            'Should use --append-out (-ao) when --n-images (-n) > 1. Otherwise only the last render will be saved')
     return args
 
 
@@ -141,14 +145,13 @@ if __name__ == '__main__':
 
     # Shift rng to generate new image when append_out is set
     if args.append_out:
-        N_REQUESTS = 3 # Requests to RNG per render. 3 for angles, 2 for location
+        N_REQUESTS = 3  # Requests to RNG per render. 3 for angles, 2 for location
         names_idx = [int(x.stem) for x in args.output_dir.glob('*.hdf5')]
         if len(names_idx):
             max_idx = max(names_idx)
             rng.bit_generator.advance(max_idx * N_REQUESTS)
 
-
-    for _ in range(args.num_images):
+    for _ in range(args.n_images):
         bproc.utility.reset_keyframes()
 
         obj.set_location([0, 0, args.conveyor_height + args.camera_elevation])
@@ -158,7 +161,8 @@ if __name__ == '__main__':
         bproc.object.simulate_physics_and_fix_final_poses(min_simulation_time=4, max_simulation_time=20,
                                                           check_object_interval=2)
         # Return object to center
-        obj.set_location([0, 0, obj.get_location()[2]])
+        if args.strict_center:
+            obj.set_location([0, 0, obj.get_location()[2]])
 
         # Set camera pose
         bproc.camera.add_camera_pose(cam_pose)
