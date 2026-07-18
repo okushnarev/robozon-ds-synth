@@ -5,24 +5,27 @@ from pathlib import Path
 import numpy as np
 
 
-
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument('--object', type=str, default='bottle',
                         help='Name of the .blend object. Object should be single in the .blend file. The first object from .blend file is used')
 
+    parser.add_argument('--n-images', '-n', type=int, default=1, help='Number of images to generate')
+
     parser.add_argument('--objects-dir', type=Path, default=Path('input/blend'), help='Directory with .blend objects')
-    parser.add_argument('--output-dir', '-od', type=Path, default=Path('output'), help='Directory to output .hdf5 files')
+    parser.add_argument('--output-dir', '-od', type=Path, default=Path('output'),
+                        help='Directory to output .hdf5 files')
+
     parser.add_argument('--append-out', '-ao', action='store_true', help='Auto append frame name in out folder')
     parser.add_argument('--seed', type=int, default=69, help='Seed for random number generator')
 
     setup_args = parser.add_argument_group('Setup arguments')
     setup_args.add_argument('--conveyor-height', '-ch', type=float, default=0.7,
-                        help='Conveyor height in meters from ground')
+                            help='Conveyor height in meters from ground')
     setup_args.add_argument('--conveyor-width', '-cw', type=float, default=0.5,
-                        help='Conveyor width in meters')
+                            help='Conveyor width in meters')
     setup_args.add_argument('--camera-elevation', '-ce', type=float, default=1,
-                        help='Camera elevation in meters from conveyor')
+                            help='Camera elevation in meters from conveyor')
 
     image_args = parser.add_argument_group('Image arguments')
     image_args.add_argument('--image-width', '-iw', type=int, default=1920, help='Image width in pixels')
@@ -32,7 +35,11 @@ def parse_args():
     renderer_args.add_argument('--max-samples', type=int, default=128, help='Max samples to render')
     renderer_args.add_argument('--noise-threshold', type=float, default=0.5, help='Noise threshold renderer parameter')
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    # Checks
+    if args.n_images > 1 and not args.append_out:
+        parser.error('Should use --append-out (-ao) when --n-images (-n) > 1. Otherwise only the last render will be saved')
+    return args
 
 
 if __name__ == '__main__':
@@ -88,7 +95,7 @@ if __name__ == '__main__':
 
     # Load object
     obj = bproc.loader.load_blend(args.objects_dir / f'{args.object}.blend')[0]
-    obj.set_cp('category_id', 1) # Use category_id > 0 to appear is segmap. 0 is background
+    obj.set_cp('category_id', 1)  # Use category_id > 0 to appear is segmap. 0 is background
     obj.enable_rigidbody(active=True)
 
     # Camera params
@@ -108,8 +115,6 @@ if __name__ == '__main__':
 
     # Set the camera to be in front of the object
     cam_pose = bproc.math.build_transformation_mat([0, 0, args.conveyor_height + args.camera_elevation], [0, 0, 0])
-    # Set camera pose
-    bproc.camera.add_camera_pose(cam_pose)
 
     # Render params
     bproc.renderer.enable_depth_output(activate_antialiasing=False)
@@ -119,17 +124,23 @@ if __name__ == '__main__':
 
     rng = np.random.default_rng(args.seed)
 
-    obj.set_location([0, 0, args.conveyor_height + args.camera_elevation])
-    obj.set_rotation_euler(rng.uniform(0, 2 * np.pi, 3))
+    for _ in range(args.num_images):
+        bproc.utility.reset_keyframes()
 
-    # Run simulation
-    bproc.object.simulate_physics_and_fix_final_poses(min_simulation_time=4, max_simulation_time=20,
-                                                      check_object_interval=2)
-    # Return object to center
-    obj.set_location([0, 0, obj.get_location()[2]])
+        obj.set_location([0, 0, args.conveyor_height + args.camera_elevation])
+        obj.set_rotation_euler(rng.uniform(0, 2 * np.pi, 3))
 
-    # Render
-    data = bproc.renderer.render()
+        # Run simulation
+        bproc.object.simulate_physics_and_fix_final_poses(min_simulation_time=4, max_simulation_time=20,
+                                                          check_object_interval=2)
+        # Return object to center
+        obj.set_location([0, 0, obj.get_location()[2]])
 
-    # Write the rendering into an hdf5 file
-    bproc.writer.write_hdf5(args.output_dir, data, append_to_existing_output=args.append_out)
+        # Set camera pose
+        bproc.camera.add_camera_pose(cam_pose)
+
+        # Render
+        data = bproc.renderer.render()
+
+        # Write the rendering into an hdf5 file
+        bproc.writer.write_hdf5(args.output_dir, data, append_to_existing_output=args.append_out)
