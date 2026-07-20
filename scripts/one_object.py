@@ -9,7 +9,7 @@ sys.path.append(str(project_root))
 
 from src.config import parse_args
 from src.core.scenes import ConveyorScene
-from src.core.lighting import ConveyorLighting
+from src.core.lighting import FactoryLighting
 from src.core.camera import CameraController
 from src.core.placement import SingleObjectPhysicsPlacement
 from src.core.pipeline import DataGenerationPipeline
@@ -23,7 +23,7 @@ def main():
         conveyor_width=args.conveyor_width,
         conveyor_height=args.conveyor_height
     )
-    lighting = ConveyorLighting()
+    lighting = FactoryLighting()
     camera = CameraController(
         image_width=args.image_width,
         image_height=args.image_height,
