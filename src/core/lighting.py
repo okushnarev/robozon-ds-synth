@@ -6,8 +6,7 @@ class BaseLighting:
     def setup(self) -> None:
         raise NotImplementedError('Each lighting strategy must implement the setup method.')
 
-
-class ConveyorLighting(BaseLighting):
+class AmbientLighting(BaseLighting):
     """The dual area light setup with ambient sunlight and factory like lamps"""
     def setup(self) -> None:
         # Create ambient light
@@ -16,6 +15,10 @@ class ConveyorLighting(BaseLighting):
         sun.blender_obj.data.angle = np.deg2rad(90)
         sun.set_energy(10)
 
+class ConveyorLighting(AmbientLighting):
+    """The dual area light setup with ambient sunlight and factory like lamps"""
+    def setup(self) -> None:
+        super().setup()
         # Create local lights
         light_top = bproc.types.Light('AREA', 'light_top')
         light_top.blender_obj.data.shape = 'RECTANGLE'
