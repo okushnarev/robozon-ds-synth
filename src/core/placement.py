@@ -5,6 +5,7 @@ from pathlib import Path
 
 class BasePlacementStrategy:
     """Interface for loading, positioning, and simulating target objects."""
+    n_requests_per_render: int
 
     def setup(self) -> None:
         """Called once during initialization to load objects and prepare them."""
