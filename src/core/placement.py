@@ -17,14 +17,13 @@ class BasePlacementStrategy:
 
 class SingleObjectPhysicsPlacement(BasePlacementStrategy):
     """Original behavior: Loads a single object and drops it onto the conveyor using physics."""
-
+    n_requests_per_render = 3
     def __init__(self, objects_dir: Path, object_name: str, spawn_height: float, strict_center: bool):
         self.objects_dir = objects_dir
         self.object_name = object_name
         self.spawn_height = spawn_height
         self.strict_center = strict_center
         self.target_obj = None
-        self.n_requests_per_render = 3 # Number of requests to random number generator. Set manually
 
     def setup(self) -> None:
         blend_file = self.objects_dir / f'{self.object_name}.blend'
