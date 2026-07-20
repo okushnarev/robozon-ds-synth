@@ -31,7 +31,6 @@ class DataGenerationPipeline:
                 self.rng.bit_generator.advance(max_idx * n_requests_per_render)
 
     def initialize_blender(self) -> None:
-        bproc.init()
         self.scene.build()
         self.lighting.setup()
         self.placement_strategy.setup()
