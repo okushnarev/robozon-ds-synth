@@ -20,7 +20,7 @@ class AmbientLighting(BaseLighting):
         self.sun.set_energy(self.energy)
 
 class LocalFactoryLighting(BaseLighting):
-    """The dual area light setup with ambient sunlight and factory like lamps"""
+    """The dual area light setup with factory like lamps"""
     def setup(self) -> None:
         # Create local lights
         self.light_top = bproc.types.Light('AREA', 'light_top')
