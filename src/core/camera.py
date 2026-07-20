@@ -33,21 +33,14 @@ class CameraController:
 
         self.setup_intrinsics()
 
-    def setup_intrinsics(self, ) -> None:
-        s_x = self.image_width / self.base_width
-        s_y = self.image_height / self.base_height
-
-        fx = self.fx * s_x
-        fy = self.fy * s_y
-        cx = self.cx * s_x
-        cy = self.cy * s_y
-
+    def setup_intrinsics(self) -> None:
         K = np.array([
-            [fx, self.s, cx],
-            [0, fy, cy],
+            [self.fx, self.s, self.cx],
+            [0, self.fy, self.cy],
             [0, 0, 1]
         ])
-        bproc.camera.set_intrinsics_from_K_matrix(K, self.image_width, self.image_height)
+        bproc.camera.set_intrinsics_from_K_matrix(K, self.base_width, self.base_height)
+        bproc.camera.set_resolution(self.image_width, self.image_height)
 
     def get_overhead_pose(self, scene_height: float) -> np.ndarray:
         """Returns pose matrix pointing straight down at the scene."""
