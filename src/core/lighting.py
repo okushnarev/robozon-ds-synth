@@ -43,23 +43,23 @@ class LocalFactoryLighting(BaseLighting):
         self.light_bot.blender_obj.data.use_shadow = self.use_shadow
 
 
-class ConveyorLighting(AmbientLighting):
+class FactoryLighting(BaseLighting):
     """The dual area light setup with ambient sunlight and factory like lamps"""
-    def setup(self) -> None:
-        super().setup()
-        # Create local lights
-        self.light_top = bproc.types.Light('AREA', 'light_top')
-        self.light_top.blender_obj.data.shape = 'RECTANGLE'
-        self.light_top.blender_obj.data.size = 0.6
-        self.light_top.blender_obj.data.size_y = 0.3
-        self.light_top.set_location([0, 0.7, 1.4])
-        self.light_top.set_rotation_euler([np.deg2rad(-45), 0, 0])
-        self.light_top.set_energy(10)
 
-        self.light_bot = bproc.types.Light('AREA', 'light_bot')
-        self.light_bot.blender_obj.data.shape = 'RECTANGLE'
-        self.light_bot.blender_obj.data.size = 0.6
-        self.light_bot.blender_obj.data.size_y = 0.3
-        self.light_bot.set_location([0, -0.7, 1.4])
-        self.light_bot.set_rotation_euler([np.deg2rad(45), 0, 0])
-        self.light_bot.set_energy(10)
+    def __init__(
+            self,
+            ambient_energy: int = 10,
+            ambient_shadow: bool = False,
+            local_energy: int = 10,
+            local_shadow: bool = True,
+    ):
+        super().__init__(
+            energy=(ambient_energy + local_energy) // 2,
+            use_shadow=(ambient_shadow or local_shadow)
+        )
+        self.ambient = AmbientLighting(ambient_energy, ambient_shadow)
+        self.local = LocalFactoryLighting(local_energy, local_shadow)
+
+    def setup(self) -> None:
+        self.ambient.setup()
+        self.local.setup()
