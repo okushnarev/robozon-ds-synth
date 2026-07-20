@@ -43,7 +43,7 @@ class CameraController:
         cy = self.cy * s_y
 
         K = np.array([
-            [fx, 0, cx],
+            [fx, self.s, cx],
             [0, fy, cy],
             [0, 0, 1]
         ])
