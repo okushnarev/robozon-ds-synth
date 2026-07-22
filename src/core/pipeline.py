@@ -98,6 +98,7 @@ class GazeboDataGenerationPipeline(DataGenerationPipeline):
         bproc.renderer.set_light_bounces(
             diffuse_bounces=0,
             glossy_bounces=0,
+            ao_bounces_render=0,
             max_bounces=1,
             transmission_bounces=0,
             transparent_max_bounces=0
