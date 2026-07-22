@@ -4,6 +4,8 @@ import numpy as np
 import shutil
 from pathlib import Path
 
+from blenderproc.python.utility.LabelIdMapping import LabelIdMapping
+
 from src.core.camera import CameraController
 from src.core.lighting import BaseLighting
 from src.core.placement import BasePlacementStrategy
@@ -50,6 +52,7 @@ class DataGenerationPipeline:
 
     def generate_dataset(self) -> None:
         cam_pose = self.camera.get_overhead_pose(self.config.conveyor_height)
+        label_mapping = LabelIdMapping.from_dict({'conveyor_object': 1})
 
         for _ in range(self.config.n_images):
             bproc.utility.reset_keyframes()
@@ -78,7 +81,8 @@ class DataGenerationPipeline:
                 instance_segmaps=seg_data['instance_segmaps'],
                 instance_attribute_maps=seg_data['instance_attribute_maps'],
                 colors=render_data['colors'],
-                color_file_format='PNG'
+                color_file_format='PNG',
+                label_mapping=label_mapping,
             )
 
 
