@@ -27,18 +27,27 @@ class DataGenerationPipeline:
 
         self.rng = np.random.default_rng(config.seed)
         self._resolve_overwrite()
-        self._align_rng_state(self.placement_strategy.n_requests_per_render)
+        self._resolve_append_out()
 
     def _resolve_overwrite(self):
         if self.config.overwrite and Path(self.config.output_dir).exists():
             shutil.rmtree(self.config.output_dir)
 
-    def _align_rng_state(self, n_requests_per_render: int) -> None:
+    def _align_rng_state(self, steps: int, n_requests_per_render: int) -> None:
+        self.rng.bit_generator.advance(steps * n_requests_per_render)
+
+    def _align_images_count(self, steps:int) -> None:
+        self.config.n_images -= steps
+
+    def _resolve_append_out(self):
         if self.config.append_out:
             existing_indices = [int(f.stem) for f in self.config.output_dir.glob('*.hdf5') if f.stem.isdigit()]
             if existing_indices:
                 max_idx = max(existing_indices) + 1
-                self.rng.bit_generator.advance(max_idx * n_requests_per_render)
+                self._align_rng_state(max_idx, self.placement_strategy.n_requests_per_render)
+                if self.config.total:
+                    self._align_images_count(len(existing_indices))
+
 
     def initialize_blender(self) -> None:
         self.scene.build()

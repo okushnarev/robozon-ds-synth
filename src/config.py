@@ -9,6 +9,8 @@ def parse_args():
                         help='Name of the .blend object. Object should be single in the .blend file. The first object from .blend file is used')
     parser.add_argument('--n-images', '-n', type=int, default=1,
                         help='Number of images to generate')
+    parser.add_argument('--total', action='store_true',
+                        help='Treat -n as target total count, not additional count')
     parser.add_argument('--objects-dir', type=Path, default=Path('input/blend'),
                         help='Directory with .blend objects')
     parser.add_argument('--output-dir', '-od', type=Path, default=Path('output'),
