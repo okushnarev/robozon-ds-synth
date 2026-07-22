@@ -45,7 +45,6 @@ class DataGenerationPipeline:
 
         # Renderer configurations
         bproc.renderer.enable_depth_output(activate_antialiasing=False)
-        bproc.renderer.enable_segmentation_output(map_by=['category_id'], default_values={'category_id': 0})
         bproc.renderer.set_max_amount_of_samples(self.config.max_samples)
         bproc.renderer.set_noise_threshold(self.config.noise_threshold)
 
@@ -58,16 +57,30 @@ class DataGenerationPipeline:
             # Objects' spatial assignment and simulation
             self.placement_strategy.step(self.rng)
 
-            # Record pose and render
             bproc.camera.add_camera_pose(cam_pose)
-            render_data = bproc.renderer.render()
 
-            # Output results
+            # RGB + Depth
+            render_data = bproc.renderer.render()
+            # Segmentation
+            seg_data = bproc.renderer.render_segmap(map_by=['instance', 'class', 'name'], default_values={'category_id': 0})
+
+            # Save RGBD + Segmentation info
+            render_data |= seg_data
             bproc.writer.write_hdf5(
                 self.config.output_dir,
                 render_data,
                 append_to_existing_output=self.config.append_out
             )
+
+            # Save COCO annotations
+            bproc.writer.write_coco_annotations(
+                output_dir=Path(self.config.output_dir) / 'coco_data',
+                instance_segmaps=seg_data['instance_segmaps'],
+                instance_attribute_maps=seg_data['instance_attribute_maps'],
+                colors=render_data['colors'],
+                color_file_format='PNG'
+            )
+
 
 
 
