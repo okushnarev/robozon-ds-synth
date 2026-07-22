@@ -16,11 +16,15 @@ class BaseLighting:
 class AmbientLighting(BaseLighting):
     """The dual area light setup with ambient sunlight and factory like lamps"""
 
+    def __init__(self, energy: int = 10, angle: float = 90, use_shadow: bool = True):
+        super().__init__(energy, use_shadow)
+        self.angle = angle
+
     def setup(self) -> None:
         # Create ambient light
         self.sun = bproc.types.Light('SUN', 'ambient')
         self.sun.blender_obj.data.use_shadow = self.use_shadow
-        self.sun.blender_obj.data.angle = np.deg2rad(90)
+        self.sun.blender_obj.data.angle = np.deg2rad(self.angle)
         self.sun.set_energy(self.energy)
 
 
