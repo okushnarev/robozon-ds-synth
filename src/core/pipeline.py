@@ -60,3 +60,17 @@ class DataGenerationPipeline:
                 render_data,
                 append_to_existing_output=self.config.append_out
             )
+
+class GazeboDataGenerationPipeline(DataGenerationPipeline):
+    def initialize_blender(self) -> None:
+        super().initialize_blender()
+
+        # Set light bounces to zero. This restricts Cycles to only calculate direct light,
+        # disabling multi-bounce global illumination to match a basic rasterized look
+        bproc.renderer.set_light_bounces(
+            diffuse_bounces=0,
+            glossy_bounces=0,
+            max_bounces=1,
+            transmission_bounces=0,
+            transparent_max_bounces=0
+        )
