@@ -35,7 +35,7 @@ class DataGenerationPipeline:
         if self.config.append_out:
             existing_indices = [int(f.stem) for f in self.config.output_dir.glob('*.hdf5') if f.stem.isdigit()]
             if existing_indices:
-                max_idx = max(existing_indices)
+                max_idx = max(existing_indices) + 1
                 self.rng.bit_generator.advance(max_idx * n_requests_per_render)
 
     def initialize_blender(self) -> None:
