@@ -4,8 +4,10 @@ import sys
 from pathlib import Path
 
 # Add project root to PATH
-project_root = Path(__file__).resolve().parent.parent
-sys.path.append(str(project_root))
+project_root = str(Path.cwd())
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
 
 from src.config import parse_args
 from src.core.scenes import ConveyorScene
