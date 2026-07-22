@@ -11,10 +11,10 @@ if project_root not in sys.path:
 
 from src.config import parse_args
 from src.core.scenes import ConveyorScene
-from src.core.lighting import FactoryLighting
+from src.core.lighting import AmbientLighting
 from src.core.camera import CameraController
 from src.core.placement import SingleObjectPhysicsPlacement
-from src.core.pipeline import DataGenerationPipeline
+from src.core.pipeline import GazeboDataGenerationPipeline
 
 
 def main():
@@ -25,7 +25,11 @@ def main():
         conveyor_width=args.conveyor_width,
         conveyor_height=args.conveyor_height
     )
-    lighting = FactoryLighting()
+    lighting = AmbientLighting(
+        angle=0,
+        energy=8,
+        use_shadow=False
+    )
     camera = CameraController(
         image_width=args.image_width,
         image_height=args.image_height,
@@ -39,7 +43,7 @@ def main():
         strict_center=args.strict_center
     )
 
-    pipeline = DataGenerationPipeline(
+    pipeline = GazeboDataGenerationPipeline(
         scene=scene,
         lighting=lighting,
         camera=camera,
