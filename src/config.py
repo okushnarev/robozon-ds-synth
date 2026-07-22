@@ -17,6 +17,8 @@ def parse_args():
                         help='Reposition objects at frame center after simulation')
     parser.add_argument('--append-out', '-ao', action='store_true',
                         help='Auto append frame name in out folder')
+    parser.add_argument('--overwrite', action='store_true',
+                        help='Overwrite existing .hdf5 files in output folder')
     parser.add_argument('--seed', type=int, default=69,
                         help='Seed for random number generator')
 

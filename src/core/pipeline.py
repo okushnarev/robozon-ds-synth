@@ -1,7 +1,10 @@
 import blenderproc as bproc
 import numpy as np
 
-from src.core.scenes import BaseScene
+import shutil
+from pathlib import Path
+
+from src.core.camera import CameraController
 from src.core.lighting import BaseLighting
 from src.core.camera import CameraController
 from src.core.placement import BasePlacementStrategy
@@ -21,7 +24,12 @@ class DataGenerationPipeline:
         self.config = config
 
         self.rng = np.random.default_rng(config.seed)
+        self._resolve_overwrite()
         self._align_rng_state(self.placement_strategy.n_requests_per_render)
+
+    def _resolve_overwrite(self):
+        if self.config.overwrite and Path(self.config.output_dir).exists():
+            shutil.rmtree(self.config.output_dir)
 
     def _align_rng_state(self, n_requests_per_render: int) -> None:
         if self.config.append_out:
