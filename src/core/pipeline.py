@@ -82,6 +82,7 @@ class DataGenerationPipeline:
                 instance_attribute_maps=seg_data['instance_attribute_maps'],
                 colors=render_data['colors'],
                 color_file_format='PNG',
+                append_to_existing_output=self.config.append_out,
                 label_mapping=label_mapping,
             )
 
