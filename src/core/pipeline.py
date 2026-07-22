@@ -6,8 +6,8 @@ from pathlib import Path
 
 from src.core.camera import CameraController
 from src.core.lighting import BaseLighting
-from src.core.camera import CameraController
 from src.core.placement import BasePlacementStrategy
+from src.core.scenes import BaseScene
 
 
 class DataGenerationPipeline:
@@ -68,6 +68,8 @@ class DataGenerationPipeline:
                 render_data,
                 append_to_existing_output=self.config.append_out
             )
+
+
 
 class GazeboDataGenerationPipeline(DataGenerationPipeline):
     def initialize_blender(self) -> None:
